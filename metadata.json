@@ -1,0 +1,5 @@
+{
+  "name": "Supabase User Signup",
+  "description": "A user signup page that integrates with Supabase Authentication. Users can register with an email and password, and are redirected to a login page upon successful signup.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripTraccker Auth</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media' // or 'class'
+    }
+  </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+
+      <!-- Configuration View -->
+      <div id="config-view" class="hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10">
+          <div class="text-center mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-white mt-4">Supabase Configuration</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-2">Enter your project details to continue.</p>
+          </div>
+          <form id="config-form">
+            <div class="space-y-6">
+              <div>
+                <label for="supabaseUrl" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project URL</label>
+                <input id="supabaseUrl" type="url" required placeholder="https://xyz.supabase.co" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label for="supabaseAnonKey" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Anon (Public) Key</label>
+                <input id="supabaseAnonKey" type="text" required placeholder="ey..." class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">Save and Continue</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Auth View -->
+      <div id="auth-view" class="hidden">
+        <!-- Login Form -->
+        <div id="login-form-container">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10">
+            <div class="text-center mb-8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+              <h1 class="text-3xl font-bold text-slate-800 dark:text-white mt-4">Sign In</h1>
+              <p class="text-slate-500 dark:text-slate-400 mt-2">Welcome back! Please sign in to continue.</p>
+            </div>
+            <form id="login-form">
+              <div class="space-y-6">
+                <div>
+                  <label for="login-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email address</label>
+                  <input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <label for="login-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                    <button type="button" id="forgot-password-link" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Forgot password?</button>
+                  </div>
+                  <input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                  <button type="submit" id="login-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors duration-200">
+                    <span class="btn-text">Sign in</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <div class="mt-6 text-center">
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Don't have an account?
+                <button id="show-signup-button" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Sign up</button>
+              </p>
+              <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Wrong project? <button id="change-config-login" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 underline">Change configuration</button></p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div id="signup-form-container" class="hidden">
+           <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10">
+            <div class="text-center mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                <h1 class="text-3xl font-bold text-slate-800 dark:text-white mt-4">Create Account</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">Join us and start your journey.</p>
+            </div>
+            <form id="signup-form">
+                <div class="space-y-6">
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email address</label>
+                    <input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
+                    <input id="signup-password" type="password" autocomplete="new-password" required minlength="6" placeholder="••••••••" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+                </div>
+                <div>
+                    <button type="submit" id="signup-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors duration-200">
+                        <span class="btn-text">Sign up</span>
+                    </button>
+                </div>
+                </div>
+            </form>
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                Already have an account?
+                <button id="show-login-button" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">Sign in</button>
+                </p>
+                 <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Wrong project? <button id="change-config-signup" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 underline">Change configuration</button></p>
+            </div>
+            </div>
+        </div>
+      </div>
+
+      <!-- Dashboard View -->
+      <div id="dashboard-view" class="hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 md:p-10 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <h1 class="text-2xl font-bold text-slate-800 dark:text-white mt-4">Login Successful!</h1>
+          <p class="text-slate-500 dark:text-slate-400 mt-2">Welcome to TripTraccker.</p>
+          <p class="text-slate-500 dark:text-slate-400 mt-2 truncate" id="user-email"></p>
+          <button id="logout-button" class="mt-6 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors duration-200">
+            <span class="btn-text">Logout</span>
+          </button>
+           <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Wrong project? <button id="change-config-dashboard" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 underline">Change configuration</button></p>
+        </div>
+      </div>
+      
+      <!-- Message container -->
+      <div id="message-container" class="mt-4"></div>
+
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm p-8">
+      <h2 class="text-2xl font-bold text-center text-slate-800 dark:text-white mb-4">Reset Password</h2>
+      <p class="text-center text-slate-500 dark:text-slate-400 mb-6">Enter your email for a password reset link.</p>
+      <form id="forgot-password-form">
+        <div class="space-y-4">
+          <div>
+            <label for="reset-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email address</label>
+            <input id="reset-email" type="email" required placeholder="you@example.com" class="appearance-none block w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white" />
+          </div>
+          <div id="modal-message-container"></div>
+          <div class="flex items-center justify-between gap-4">
+            <button type="button" id="cancel-reset-button" class="w-full flex justify-center py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">Cancel</button>
+            <button type="submit" id="reset-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed transition-colors duration-200">
+                <span class="btn-text">Send Link</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/+esm';
+
+    let supabase;
+
+    // DOM Elements
+    const views = {
+      config: document.getElementById('config-view'),
+      auth: document.getElementById('auth-view'),
+      dashboard: document.getElementById('dashboard-view'),
+    };
+    const forms = {
+        config: document.getElementById('config-form'),
+        login: document.getElementById('login-form'),
+        signup: document.getElementById('signup-form'),
+        forgotPassword: document.getElementById('forgot-password-form')
+    };
+    const inputs = {
+        supabaseUrl: document.getElementById('supabaseUrl'),
+        supabaseAnonKey: document.getElementById('supabaseAnonKey'),
+        loginEmail: document.getElementById('login-email'),
+        loginPassword: document.getElementById('login-password'),
+        signupEmail: document.getElementById('signup-email'),
+        signupPassword: document.getElementById('signup-password'),
+        resetEmail: document.getElementById('reset-email'),
+    };
+    const buttons = {
+        login: document.getElementById('login-button'),
+        signup: document.getElementById('signup-button'),
+        logout: document.getElementById('logout-button'),
+        reset: document.getElementById('reset-button'),
+        showSignup: document.getElementById('show-signup-button'),
+        showLogin: document.getElementById('show-login-button'),
+        forgotPasswordLink: document.getElementById('forgot-password-link'),
+        cancelReset: document.getElementById('cancel-reset-button'),
+    };
+    const messageContainer = document.getElementById('message-container');
+    const modalMessageContainer = document.getElementById('modal-message-container');
+    const userEmailEl = document.getElementById('user-email');
+    const loginFormContainer = document.getElementById('login-form-container');
+    const signupFormContainer = document.getElementById('signup-form-container');
+    const forgotPasswordModal = document.getElementById('forgot-password-modal');
+
+    // Utility functions
+    const showView = (viewName) => {
+      Object.values(views).forEach(view => view.classList.add('hidden'));
+      if (views[viewName]) {
+        views[viewName].classList.remove('hidden');
+      }
+    };
+
+    const showMessage = (text, type = 'error', modal = false) => {
+      const container = modal ? modalMessageContainer : messageContainer;
+      const color = type === 'success' ? 'green' : 'red';
+      container.innerHTML = `<div class="p-3 bg-${color}-100 dark:bg-${color}-900/30 border border-${color}-300 dark:border-${color}-700 rounded-md text-center"><p class="text-sm text-${color}-700 dark:text-${color}-300">${text}</p></div>`;
+    };
+
+    const clearMessages = () => {
+      messageContainer.innerHTML = '';
+      modalMessageContainer.innerHTML = '';
+    };
+    
+    const spinner = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+    const setLoading = (button, isLoading, text) => {
+        button.disabled = isLoading;
+        const btnText = button.querySelector('.btn-text');
+        if (isLoading) {
+            btnText.textContent = text;
+            button.insertAdjacentHTML('afterbegin', spinner);
+        } else {
+            btnText.textContent = text;
+            const spinnerEl = button.querySelector('svg');
+            if(spinnerEl) spinnerEl.remove();
+        }
+    };
+
+
+    // Event Handlers
+    const handleConfigSave = (e) => {
+      e.preventDefault();
+      localStorage.setItem('supabaseUrl', inputs.supabaseUrl.value);
+      localStorage.setItem('supabaseAnonKey', inputs.supabaseAnonKey.value);
+      main(); // Re-initialize
+    };
+
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      clearMessages();
+      setLoading(buttons.login, true, 'Signing in...');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: inputs.loginEmail.value,
+        password: inputs.loginPassword.value,
+      });
+
+      if (error) {
+        showMessage(error.message);
+      } else if (data.user && !data.user.email_confirmed_at) {
+        showMessage('Your email is not confirmed. Please check your email for the confirmation link.');
+        await supabase.auth.signOut();
+      }
+      // onAuthStateChange will handle successful, confirmed login
+      setLoading(buttons.login, false, 'Sign in');
+    };
+
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        clearMessages();
+        setLoading(buttons.signup, true, 'Processing...');
+        const { data, error } = await supabase.auth.signUp({
+            email: inputs.signupEmail.value,
+            password: inputs.signupPassword.value,
+        });
+        if (error) {
+            showMessage(error.message);
+        } else if (data.user?.identities?.length === 0) {
+            showMessage('User already exists. Please sign in.');
+        } else {
+            showMessage('Registration successful! Please check your email inbox to confirm your address before logging in.', 'success');
+        }
+        setLoading(buttons.signup, false, 'Sign up');
+    };
+
+    const handleLogout = async () => {
+        setLoading(buttons.logout, true, 'Logging out...');
+        await supabase.auth.signOut();
+        // onAuthStateChange will handle view switch
+        setLoading(buttons.logout, false, 'Logout');
+    };
+    
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        clearMessages();
+        setLoading(buttons.reset, true, 'Sending...');
+        // Set redirectTo to ensure Supabase uses its secure hosted page.
+        // After reset, the user is sent to the Site URL in your Supabase project settings.
+        const { error } = await supabase.auth.resetPasswordForEmail(inputs.resetEmail.value, {
+            redirectTo: '/',
+        });
+        if (error) {
+            showMessage(error.message, 'error', true);
+        } else {
+            showMessage('Password reset link sent to your email. Please check your inbox and click the link to set a new password.', 'success', true);
+        }
+        setLoading(buttons.reset, false, 'Send Link');
+    };
+    
+    const clearCredentialsAndReset = () => {
+        localStorage.removeItem('supabaseUrl');
+        localStorage.removeItem('supabaseAnonKey');
+        supabase = null;
+        main();
+    };
+
+    // Main initialization logic
+    const main = async () => {
+      clearMessages();
+      const supabaseUrl = localStorage.getItem('supabaseUrl');
+      const supabaseAnonKey = localStorage.getItem('supabaseAnonKey');
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        showView('config');
+        return;
+      }
+
+      try {
+        supabase = createClient(supabaseUrl, supabaseAnonKey);
+      } catch (e) {
+        localStorage.removeItem('supabaseUrl');
+        localStorage.removeItem('supabaseAnonKey');
+        alert('Invalid Supabase credentials. Please re-enter them.');
+        showView('config');
+        return;
+      }
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          userEmailEl.textContent = `as ${session.user.email}`;
+          showView('dashboard');
+        } else {
+          showView('auth');
+        }
+      });
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        userEmailEl.textContent = `as ${session.user.email}`;
+        showView('dashboard');
+      } else {
+        showView('auth');
+      }
+    };
+
+    // Attach event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      forms.config.addEventListener('submit', handleConfigSave);
+      forms.login.addEventListener('submit', handleLogin);
+      forms.signup.addEventListener('submit', handleSignup);
+      forms.forgotPassword.addEventListener('submit', handleForgotPassword);
+      buttons.logout.addEventListener('click', handleLogout);
+
+      buttons.showSignup.addEventListener('click', () => {
+        clearMessages();
+        loginFormContainer.classList.add('hidden');
+        signupFormContainer.classList.remove('hidden');
+      });
+
+      buttons.showLogin.addEventListener('click', () => {
+        clearMessages();
+        signupFormContainer.classList.add('hidden');
+        loginFormContainer.classList.remove('hidden');
+      });
+      
+      buttons.forgotPasswordLink.addEventListener('click', () => {
+          clearMessages();
+          forgotPasswordModal.classList.remove('hidden');
+      });
+
+      buttons.cancelReset.addEventListener('click', () => forgotPasswordModal.classList.add('hidden'));
+      forgotPasswordModal.addEventListener('click', (e) => {
+        if (e.target === forgotPasswordModal) {
+            forgotPasswordModal.classList.add('hidden');
+        }
+      });
+
+      [
+        document.getElementById('change-config-login'),
+        document.getElementById('change-config-signup'),
+        document.getElementById('change-config-dashboard')
+      ].forEach(btn => btn.addEventListener('click', clearCredentialsAndReset));
+      
+      main();
+
+      if (window.location.hash.includes('password-reset-success')) {
+        showMessage('Your password has been successfully updated. You can now sign in with your new password.', 'success');
+        // Clean the hash from the URL to prevent the message from showing again on refresh
+        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+      }
+    });
+  </script>
+</body>
+</html>
